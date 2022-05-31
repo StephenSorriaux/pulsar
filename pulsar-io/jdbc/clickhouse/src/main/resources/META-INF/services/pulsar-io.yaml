@@ -17,6 +17,6 @@
 # under the License.
 #
 
-name: jdbc-clickhouse
+name: batch-jdbc-clickhouse
 description: JDBC sink for ClickHouse
-sinkClass: org.apache.pulsar.io.jdbc.ClickHouseJdbcAutoSchemaSink
+sinkClass: org.apache.pulsar.io.jdbc.BatchClickHouseJdbcAutoSchemaSink

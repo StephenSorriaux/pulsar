@@ -20,6 +20,7 @@
 package org.apache.pulsar.io.jdbc;
 
 import com.google.common.collect.Lists;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -200,7 +201,7 @@ public abstract class JdbcAbstractSink<T> implements Sink<T> {
                         case INSERT:
                             bindValue(insertStatement, record, action);
                             count += 1;
-                            insertStatement.execute();
+                            insertStatement.addBatch();
                             break;
                         default:
                             String msg = String.format("Unsupported action %s, can be one of %s, or not set which indicate %s",
@@ -208,6 +209,7 @@ public abstract class JdbcAbstractSink<T> implements Sink<T> {
                             throw new IllegalArgumentException(msg);
                     }
                 }
+                insertStatement.executeBatch();
                 connection.commit();
                 swapList.forEach(Record::ack);
             } catch (Exception e) {
@@ -230,6 +232,10 @@ public abstract class JdbcAbstractSink<T> implements Sink<T> {
                 log.debug("Already in flushing state, will not flush, queue size: {}", incomingList.size());
             }
         }
+    }
+
+    public Array getArray(String elementType, Object[] elements) throws Exception {
+        return connection.createArrayOf(elementType, elements);
     }
 
 }

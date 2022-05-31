@@ -19,8 +19,10 @@
 
 package org.apache.pulsar.io.jdbc;
 
+import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +88,7 @@ public abstract class BaseJdbcAutoSchemaSink extends JdbcAbstractSink<GenericRec
 
     }
 
-    private static void setColumnValue(PreparedStatement statement, int index, Object value) throws Exception {
+    private void setColumnValue(PreparedStatement statement, int index, Object value) throws Exception {
 
         log.debug("Setting column value, statement: {}, index: {}, value: {}", statement.toString(), index, value.toString());
 
@@ -104,6 +106,31 @@ public abstract class BaseJdbcAutoSchemaSink extends JdbcAbstractSink<GenericRec
             statement.setString(index, (String)value);
         } else if (value instanceof Short) {
             statement.setShort(index, (Short) value);
+        } else if (value instanceof List) {
+            List list = (List) value;
+            Array array = getArray("STRING", new String[]{});
+            if (!list.isEmpty()) {
+                Object element = list.get(0);
+                if (element instanceof Integer) {
+                    array = getArray("INTEGER", list.toArray());
+                } else if (element instanceof Long) {
+                    array = getArray("LONG", list.toArray());
+                } else if (element instanceof Double) {
+                    array = getArray("DOUBLE", list.toArray());
+                } else if (element instanceof Float) {
+                    array = getArray("FLOAT", list.toArray());
+                } else if (element instanceof Boolean) {
+                    array = getArray("BOOLEAN", list.toArray());
+                } else if (element instanceof String) {
+                    array = getArray("STRING", list.toArray());
+                } else if (element instanceof Short) {
+                    array = getArray("SHORT", list.toArray());
+                } else {
+                    array = getArray("STRING", list.toArray());
+                    //throw new Exception("Not support array element type, need to add it. " + element.getClass());
+                }
+            }
+            statement.setArray(index, array);
         } else {
             throw new Exception("Not support value type, need to add it. " + value.getClass());
         }

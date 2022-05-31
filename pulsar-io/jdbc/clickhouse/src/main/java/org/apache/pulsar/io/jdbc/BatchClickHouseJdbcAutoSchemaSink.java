@@ -22,11 +22,11 @@ import org.apache.pulsar.io.core.annotations.Connector;
 import org.apache.pulsar.io.core.annotations.IOType;
 
 @Connector(
-    name = "jdbc-clickhouse",
+    name = "batch-jdbc-clickhouse",
     type = IOType.SINK,
     help = "A simple JDBC sink for ClickHouse that writes pulsar messages to a database table",
     configClass = JdbcSinkConfig.class
 )
-public class ClickHouseJdbcAutoSchemaSink extends BaseJdbcAutoSchemaSink {
+public class BatchClickHouseJdbcAutoSchemaSink extends BaseJdbcAutoSchemaSink {
 
 }
